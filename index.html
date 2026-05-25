@@ -264,7 +264,7 @@ function buildPanel() {
   for (let i = 1; i <= cfg.lanes; i++) {
     const lbl = document.createElement('div');
     lbl.className = 'section-label';
-    lbl.innerHTML = `🚗 <span>${i}번차선</span>`;
+    lbl.innerHTML = `🚗 <span>${i}번 차선</span>`;
     const badge = document.createElement('span');
     badge.className = 'section-badge';
     badge.id = `sec_lane_${i}`;
@@ -368,7 +368,7 @@ function exportCSV() {
   rows.push(['구역', '항목', '합계', '', '']);
   Object.keys(counts).forEach(k => {
     const p = k.split('__');
-    const zone = p[0] === 'lane' ? `${p[1]}차선` : `횡단보도 ${p[1]}`;
+    const zone = p[0] === 'lane' ? `${p[1]}번 차선` : `횡단보도 ${p[1]}`;
     rows.push([zone, p[2], counts[k], '', '']);
   });
   const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
