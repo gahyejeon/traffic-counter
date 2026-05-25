@@ -1,1 +1,1 @@
-[https://gahyejeon.github.io/traffic-counter](https://gahyejeon.github.io/traffic-counter?v=4)
+[https://gahyejeon.github.io/traffic-counter](https://gahyejeon.github.io/traffic-counter?v=5)
