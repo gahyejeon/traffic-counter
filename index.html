@@ -264,7 +264,7 @@ function buildPanel() {
   for (let i = 1; i <= cfg.lanes; i++) {
     const lbl = document.createElement('div');
     lbl.className = 'section-label';
-    lbl.innerHTML = `🚗 <span>${i}차선</span>`;
+    lbl.innerHTML = `🚗 <span>${i}번차선</span>`;
     const badge = document.createElement('span');
     badge.className = 'section-badge';
     badge.id = `sec_lane_${i}`;
