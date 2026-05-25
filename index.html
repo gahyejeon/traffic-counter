@@ -142,6 +142,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     <span class="spacer"></span>
     <button class="topbar-btn" onclick="openSetup()">⚙ 현장 설정</button>
     <button class="topbar-btn green" onclick="exportCSV()">↓ CSV 내보내기</button>
+    <button class="topbar-btn green" id="sheetBtn" onclick="sendToSheet()">📊 시트로 전송</button>
     <button class="topbar-btn red" onclick="resetAll()">↺ 초기화</button>
   </div>
 
@@ -485,6 +486,72 @@ document.addEventListener('keydown', e => {
 });
 
 buildPanel();
+
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwj3jnobX0cEXOJetkbf3iqTjE3yzgkEOT55DkaqGkhEWKqAGL_-CC52hTSatWZ4PXV/exec';
+
+async function sendToSheet() {
+  if (Object.keys(counts).length === 0) {
+    alert('데이터가 없어요. 먼저 카운트를 입력해주세요.');
+    return;
+  }
+  const btn = document.getElementById('sheetBtn');
+  btn.textContent = '⏳ 전송 중...';
+  btn.disabled = true;
+
+  const rows = [];
+  for (let i = 1; i <= cfg.lanes; i++) {
+    let zoneTotal = 0;
+    cfg.laneItems.forEach(item => {
+      const k = key('lane', i, item);
+      zoneTotal += counts[k] || 0;
+    });
+    cfg.laneItems.forEach(item => {
+      const k = key('lane', i, item);
+      rows.push({ zone: `${i}번 차선`, item, value: counts[k] || 0, zoneTotal });
+    });
+  }
+  for (let i = 1; i <= cfg.crosses; i++) {
+    let zoneTotal = 0;
+    cfg.crossItems.forEach(item => {
+      const k = key('cross', i, item);
+      zoneTotal += counts[k] || 0;
+    });
+    cfg.crossItems.forEach(item => {
+      const k = key('cross', i, item);
+      rows.push({ zone: `횡단보도 ${i}`, item, value: counts[k] || 0, zoneTotal });
+    });
+  }
+
+  const payload = {
+    type: 'summary',
+    location: cfg.location || '현장미설정',
+    rows
+  };
+
+  try {
+    await fetch(GAS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    btn.textContent = '✓ 전송 완료!';
+    btn.style.borderColor = 'var(--accent-border)';
+    btn.style.color = 'var(--accent)';
+    btn.style.background = 'var(--accent-dim)';
+    setTimeout(() => {
+      btn.textContent = '📊 시트로 전송';
+      btn.style.borderColor = '';
+      btn.style.color = '';
+      btn.style.background = '';
+      btn.disabled = false;
+    }, 3000);
+  } catch (err) {
+    alert('전송 실패: ' + err.message);
+    btn.textContent = '📊 시트로 전송';
+    btn.disabled = false;
+  }
+}
 </script>
 </body>
 </html>
