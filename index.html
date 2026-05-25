@@ -313,7 +313,7 @@ function change(k, delta) {
   document.getElementById('v_' + k).textContent = counts[k];
   const parts = k.split('__');
   const type = parts[0], idx = parts[1], item = parts[2];
-  const sectionName = type === 'lane' ? `${idx}차선` : `횡단보도 ${idx}`;
+  const sectionName = type === 'lane' ? `${idx}번 차선` : `횡단보도 ${idx}`;
   logs.unshift({ ts: curTime(), type, idx, item, sectionName, delta, val: counts[k] });
   renderLog();
   updateSectionBadges();
