@@ -358,13 +358,34 @@ function exportCSV() {
     alert('아직 기록된 데이터가 없어요.');
     return;
   }
-  let rows = [['=== 최종 집계 ===', '', '', '', ''], ['구역', '항목', '합계', '', '']];
-  Object.keys(counts).forEach(k => {
-    const p = k.split('__');
-    const zone = p[0] === 'lane' ? `${p[1]}번 차선` : `횡단보도 ${p[1]}`;
-    rows.push([zone, p[2], counts[k], '', '']);
-  });
-  rows.push(['', '', '', '', '']);
+  let rows = [['=== 최종 집계 ===', '', '', '', ''], ['구역', '항목', '합계', '구역 합계', '']];
+
+  // 차선별 그룹화하여 소계 포함
+  for (let i = 1; i <= cfg.lanes; i++) {
+    let laneTotal = 0;
+    cfg.laneItems.forEach(item => {
+      const k = key('lane', i, item);
+      const val = counts[k] || 0;
+      laneTotal += val;
+      rows.push([`${i}번 차선`, item, val, '', '']);
+    });
+    rows.push([`${i}번 차선 합계`, '', '', laneTotal, '']);
+    rows.push(['', '', '', '', '']);
+  }
+
+  // 횡단보도별 그룹화하여 소계 포함
+  for (let i = 1; i <= cfg.crosses; i++) {
+    let crossTotal = 0;
+    cfg.crossItems.forEach(item => {
+      const k = key('cross', i, item);
+      const val = counts[k] || 0;
+      crossTotal += val;
+      rows.push([`횡단보도 ${i}`, item, val, '', '']);
+    });
+    rows.push([`횡단보도 ${i} 합계`, '', '', crossTotal, '']);
+    rows.push(['', '', '', '', '']);
+  }
+
   rows.push(['=== 상세 로그 ===', '', '', '', '']);
   rows.push(['타임스탬프', '구역', '항목', '변화', '누적값']);
   [...logs].reverse().forEach(e => {
