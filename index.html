@@ -198,13 +198,13 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
         <label>현장 이름</label>
         <input type="text" id="fLocName" placeholder="예: 강남역 사거리 A구역">
       </div>
-      <div class="section-divider">🚗 차선</div>
+      <div class="section-divider">🚗 번 차선</div>
       <div class="field">
-        <label>차선 수</label>
+        <label>번 차선 수</label>
         <input type="number" id="fLanes" min="1" max="10" value="3" style="width:80px">
       </div>
       <div class="field">
-        <label>차선 체크 항목</label>
+        <label>번 차선 체크 항목</label>
         <div id="fLaneItems"></div>
         <div class="add-row" onclick="addItem('lane')">＋ 항목 추가</div>
       </div>
@@ -265,7 +265,7 @@ function buildPanel() {
   for (let i = 1; i <= cfg.lanes; i++) {
     const lbl = document.createElement('div');
     lbl.className = 'section-label';
-    lbl.innerHTML = `🚗 <span>${i}차선</span>`;
+    lbl.innerHTML = `🚗 <span>${i}번 차선</span>`;
     const badge = document.createElement('span');
     badge.className = 'section-badge';
     badge.id = `sec_lane_${i}`;
@@ -314,7 +314,7 @@ function change(k, delta) {
   document.getElementById('v_' + k).textContent = counts[k];
   const parts = k.split('__');
   const type = parts[0], idx = parts[1], item = parts[2];
-  const sectionName = type === 'lane' ? `${idx}차선` : `횡단보도 ${idx}`;
+  const sectionName = type === 'lane' ? `${idx}번 차선` : `횡단보도 ${idx}`;
   logs.unshift({ ts: curTime(), type, idx, item, sectionName, delta, val: counts[k] });
   renderLog();
   updateSectionBadges();
@@ -361,16 +361,16 @@ function exportCSV() {
   }
   let rows = [['=== 최종 집계 ===', '', '', '', ''], ['구역', '항목', '합계', '구역 합계', '']];
 
-  // 차선별 그룹화하여 소계 포함
+  // 번 차선별 그룹화하여 소계 포함
   for (let i = 1; i <= cfg.lanes; i++) {
     let laneTotal = 0;
     cfg.laneItems.forEach(item => {
       const k = key('lane', i, item);
       const val = counts[k] || 0;
       laneTotal += val;
-      rows.push([`${i}번 차선`, item, val, '', '']);
+      rows.push([`${i}번 번 차선`, item, val, '', '']);
     });
-    rows.push([`${i}번 차선 합계`, '', '', laneTotal, '']);
+    rows.push([`${i}번 번 차선 합계`, '', '', laneTotal, '']);
     rows.push(['', '', '', '', '']);
   }
 
@@ -507,7 +507,7 @@ async function sendToSheet() {
     });
     cfg.laneItems.forEach(item => {
       const k = key('lane', i, item);
-      rows.push({ zone: `${i}번 차선`, item, value: counts[k] || 0, zoneTotal });
+      rows.push({ zone: `${i}번 번 차선`, item, value: counts[k] || 0, zoneTotal });
     });
   }
   for (let i = 1; i <= cfg.crosses; i++) {
