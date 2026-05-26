@@ -368,9 +368,9 @@ function exportCSV() {
       const k = key('lane', i, item);
       const val = counts[k] || 0;
       laneTotal += val;
-      rows.push([`${i}번 번 차선`, item, val, '', '']);
+      rows.push([`${i}번 차선`, item, val, '', '']);
     });
-    rows.push([`${i}번 번 차선 합계`, '', '', laneTotal, '']);
+    rows.push([`${i}번 차선 합계`, '', '', laneTotal, '']);
     rows.push(['', '', '', '', '']);
   }
 
@@ -507,7 +507,7 @@ async function sendToSheet() {
     });
     cfg.laneItems.forEach(item => {
       const k = key('lane', i, item);
-      rows.push({ zone: `${i}번 번 차선`, item, value: counts[k] || 0, zoneTotal });
+      rows.push({ zone: `${i}번 차선`, item, value: counts[k] || 0, zoneTotal });
     });
   }
   for (let i = 1; i <= cfg.crosses; i++) {
