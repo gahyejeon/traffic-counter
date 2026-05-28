@@ -22,15 +22,17 @@
   --red: #f87171;
   --red-dim: rgba(248,113,113,0.1);
   --amber: #fbbf24;
+  --amber-dim: rgba(251,191,36,0.1);
   --blue: #60a5fa;
   --blue-dim: rgba(96,165,250,0.1);
+  --orange: #fb923c;
+  --orange-dim: rgba(251,146,60,0.1);
   --mono: 'DM Mono', monospace;
   --sans: 'Pretendard', -apple-system, sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
 
-/* Layout */
 .app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
 .topbar{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0}
 .logo{font-family:var(--mono);font-size:13px;color:var(--accent);letter-spacing:0.05em;font-weight:500}
@@ -79,20 +81,33 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .log-delta.up{color:var(--accent)}
 .log-delta.down{color:var(--red)}
 .log-delta.mark{color:var(--amber)}
+.log-delta.false-pos{color:var(--amber)}
+.log-delta.false-neg{color:var(--orange)}
 .log-empty{font-size:12px;color:var(--text3);text-align:center;padding:20px 0}
 
 /* Right panel */
-.right-panel{width:320px;flex-shrink:0;border-left:1px solid var(--border);overflow-y:auto;background:var(--surface)}
+.right-panel{width:340px;flex-shrink:0;border-left:1px solid var(--border);overflow-y:auto;background:var(--surface)}
 .right-panel::-webkit-scrollbar{width:4px}
 .right-panel::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 
 .section-label{display:flex;align-items:center;gap:8px;padding:10px 14px 6px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);font-weight:500;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1}
 .section-badge{font-family:var(--mono);font-size:10px;color:var(--text3);margin-left:auto}
 
-.counter-row{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:1px solid var(--border);gap:10px}
-.counter-row:hover{background:var(--surface2)}
-.counter-name{font-size:13px;flex:1;color:var(--text)}
-.counter-ctrl{display:flex;align-items:center;gap:0}
+/* Main counter row */
+.counter-row{border-bottom:1px solid var(--border)}
+.counter-main{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;gap:10px;transition:background .1s}
+.counter-main:hover{background:var(--surface2)}
+.counter-name-wrap{display:flex;align-items:center;gap:6px;flex:1;min-width:0}
+.counter-name{font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Expand toggle */
+.expand-toggle{display:flex;align-items:center;gap:3px;padding:2px 6px;border:1px solid var(--border2);border-radius:4px;background:none;cursor:pointer;color:var(--text3);font-size:10px;letter-spacing:.04em;transition:all .15s;flex-shrink:0;white-space:nowrap}
+.expand-toggle:hover{border-color:var(--amber);color:var(--amber);background:var(--amber-dim)}
+.expand-toggle.open{border-color:var(--amber);color:var(--amber);background:var(--amber-dim)}
+.expand-toggle .arrow{font-size:8px;transition:transform .2s}
+.expand-toggle.open .arrow{transform:rotate(180deg)}
+
+.counter-ctrl{display:flex;align-items:center;gap:0;flex-shrink:0}
 .ctrl-btn{width:30px;height:30px;border:1px solid var(--border2);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .12s;color:var(--text2);font-weight:400}
 .ctrl-btn:first-child{border-radius:6px 0 0 6px}
 .ctrl-btn:last-child{border-radius:0 6px 6px 0}
@@ -100,6 +115,25 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .ctrl-btn.minus:hover{background:var(--red-dim);border-color:rgba(248,113,113,.3);color:var(--red)}
 .ctrl-btn:active{transform:scale(.92)}
 .ctrl-val{font-family:var(--mono);font-size:16px;font-weight:500;min-width:40px;text-align:center;border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);height:30px;display:flex;align-items:center;justify-content:center;color:var(--text)}
+
+/* Sub-rows: 오탐 / 미탐 */
+.sub-rows{overflow:hidden;max-height:0;transition:max-height .25s ease}
+.sub-rows.open{max-height:200px}
+.sub-row{display:flex;align-items:center;justify-content:space-between;padding:6px 14px 6px 32px;gap:10px;background:#1a1a1a;border-top:1px solid var(--border)}
+.sub-row:last-child{border-bottom:2px solid var(--border2)}
+.sub-label{display:flex;align-items:center;gap:6px;font-size:12px;flex:1}
+.sub-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sub-dot.fp{background:var(--amber)}
+.sub-dot.fn{background:var(--orange)}
+.sub-name{color:var(--text2)}
+.sub-ctrl{display:flex;align-items:center;gap:0}
+.sub-btn{width:24px;height:24px;border:1px solid var(--border2);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .12s;color:var(--text3)}
+.sub-btn:first-child{border-radius:4px 0 0 4px}
+.sub-btn:last-child{border-radius:0 4px 4px 0}
+.sub-btn.plus:hover{background:var(--amber-dim);border-color:rgba(251,191,36,.3);color:var(--amber)}
+.sub-btn.minus:hover{background:var(--red-dim);border-color:rgba(248,113,113,.3);color:var(--red)}
+.sub-btn:active{transform:scale(.92)}
+.sub-val{font-family:var(--mono);font-size:13px;font-weight:500;min-width:32px;text-align:center;border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);height:24px;display:flex;align-items:center;justify-content:center;color:var(--text2)}
 
 /* Setup Modal */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:200}
@@ -128,14 +162,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .btn-cancel:hover{color:var(--text);border-color:var(--text2)}
 .btn-apply{padding:8px 20px;border:1px solid var(--accent-border);border-radius:6px;background:var(--accent-dim);color:var(--accent);font-family:var(--sans);font-size:13px;cursor:pointer;font-weight:500;transition:all .15s}
 .btn-apply:hover{background:rgba(74,222,128,.22)}
-
-/* Keyboard shortcut hints */
-.kbd-hint{display:inline-block;font-family:var(--mono);font-size:9px;color:var(--text3);background:var(--surface2);border:1px solid var(--border2);border-radius:3px;padding:1px 5px;margin-left:4px}
 </style>
 </head>
 <body>
 <div class="app">
-  <!-- Topbar -->
   <div class="topbar">
     <span class="logo">TRAFFIC.COUNT</span>
     <span class="loc-tag" id="locTag" onclick="openSetup()">📍 현장 미설정</span>
@@ -147,7 +177,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   </div>
 
   <div class="body">
-    <!-- Left: video + log -->
     <div class="video-panel">
       <div id="videoBox">
         <div class="video-drop" id="videoDrop" onclick="document.getElementById('fileInput').click()">
@@ -181,7 +210,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
       </div>
     </div>
 
-    <!-- Right: counters -->
     <div class="right-panel" id="rightPanel"></div>
   </div>
 </div>
@@ -238,10 +266,16 @@ let cfg = {
   crossItems: [...DEFAULT_CROSS_ITEMS]
 };
 
+// counts[k] = main count
+// subCounts[k + '__fp'] = 오탐
+// subCounts[k + '__fn'] = 미탐
 let counts = {};
+let subCounts = {};
 let logs = [];
 let tempLane = [...DEFAULT_LANE_ITEMS];
 let tempCross = [...DEFAULT_CROSS_ITEMS];
+// Track which rows are expanded
+let expanded = {};
 
 const video = document.getElementById('videoEl');
 
@@ -259,6 +293,7 @@ function key(type, idx, item) { return `${type}__${idx}__${item}`; }
 
 function buildPanel() {
   counts = {};
+  subCounts = {};
   const panel = document.getElementById('rightPanel');
   panel.innerHTML = '';
 
@@ -274,6 +309,8 @@ function buildPanel() {
     cfg.laneItems.forEach(item => {
       const k = key('lane', i, item);
       counts[k] = 0;
+      subCounts[k + '__fp'] = 0;
+      subCounts[k + '__fn'] = 0;
       panel.appendChild(makeRow(k, item));
     });
   }
@@ -290,6 +327,8 @@ function buildPanel() {
     cfg.crossItems.forEach(item => {
       const k = key('cross', i, item);
       counts[k] = 0;
+      subCounts[k + '__fp'] = 0;
+      subCounts[k + '__fn'] = 0;
       panel.appendChild(makeRow(k, item));
     });
   }
@@ -297,16 +336,70 @@ function buildPanel() {
 }
 
 function makeRow(k, label) {
-  const row = document.createElement('div');
-  row.className = 'counter-row';
-  row.innerHTML = `
-    <span class="counter-name">${label}</span>
+  const wrap = document.createElement('div');
+  wrap.className = 'counter-row';
+  wrap.id = `row_${k}`;
+
+  // Main row
+  const main = document.createElement('div');
+  main.className = 'counter-main';
+  main.innerHTML = `
+    <div class="counter-name-wrap">
+      <span class="counter-name">${label}</span>
+      <button class="expand-toggle" id="toggle_${k}" onclick="toggleSub('${k}')">
+        오탐·미탐 <span class="arrow">▼</span>
+      </button>
+    </div>
     <div class="counter-ctrl">
       <button class="ctrl-btn minus" onclick="change('${k}',-1)">−</button>
       <span class="ctrl-val" id="v_${k}">0</span>
       <button class="ctrl-btn plus" onclick="change('${k}',1)">+</button>
     </div>`;
-  return row;
+  wrap.appendChild(main);
+
+  // Sub rows (오탐 / 미탐)
+  const sub = document.createElement('div');
+  sub.className = 'sub-rows';
+  sub.id = `sub_${k}`;
+  sub.innerHTML = `
+    <div class="sub-row">
+      <div class="sub-label">
+        <span class="sub-dot fp"></span>
+        <span class="sub-name">오탐 (False Positive)</span>
+      </div>
+      <div class="sub-ctrl">
+        <button class="sub-btn minus" onclick="changeSub('${k}','fp',-1)">−</button>
+        <span class="sub-val" id="sv_${k}__fp">0</span>
+        <button class="sub-btn plus" onclick="changeSub('${k}','fp',1)">+</button>
+      </div>
+    </div>
+    <div class="sub-row">
+      <div class="sub-label">
+        <span class="sub-dot fn"></span>
+        <span class="sub-name">미탐 (False Negative)</span>
+      </div>
+      <div class="sub-ctrl">
+        <button class="sub-btn minus" onclick="changeSub('${k}','fn',-1)">−</button>
+        <span class="sub-val" id="sv_${k}__fn">0</span>
+        <button class="sub-btn plus" onclick="changeSub('${k}','fn',1)">+</button>
+      </div>
+    </div>`;
+  wrap.appendChild(sub);
+
+  return wrap;
+}
+
+function toggleSub(k) {
+  expanded[k] = !expanded[k];
+  const sub = document.getElementById(`sub_${k}`);
+  const tog = document.getElementById(`toggle_${k}`);
+  if (expanded[k]) {
+    sub.classList.add('open');
+    tog.classList.add('open');
+  } else {
+    sub.classList.remove('open');
+    tog.classList.remove('open');
+  }
 }
 
 function change(k, delta) {
@@ -315,7 +408,20 @@ function change(k, delta) {
   const parts = k.split('__');
   const type = parts[0], idx = parts[1], item = parts[2];
   const sectionName = type === 'lane' ? `${idx}번 차선` : `횡단보도 ${idx}`;
-  logs.unshift({ ts: curTime(), type, idx, item, sectionName, delta, val: counts[k] });
+  logs.unshift({ ts: curTime(), type, idx, item, sectionName, delta, val: counts[k], sub: null });
+  renderLog();
+  updateSectionBadges();
+}
+
+function changeSub(k, subType, delta) {
+  const sk = k + '__' + subType;
+  subCounts[sk] = Math.max(0, (subCounts[sk] || 0) + delta);
+  document.getElementById('sv_' + sk).textContent = subCounts[sk];
+  const parts = k.split('__');
+  const type = parts[0], idx = parts[1], item = parts[2];
+  const sectionName = type === 'lane' ? `${idx}번 차선` : `횡단보도 ${idx}`;
+  const subLabel = subType === 'fp' ? '오탐' : '미탐';
+  logs.unshift({ ts: curTime(), type, idx, item, sectionName, delta, val: subCounts[sk], sub: subLabel });
   renderLog();
   updateSectionBadges();
 }
@@ -348,6 +454,11 @@ function renderLog() {
   }
   el.innerHTML = shown.map(e => {
     if (e.mark) return `<div class="log-item"><span class="log-ts">${fmt(e.ts)}</span><span class="log-zone" style="color:#fbbf24">⚑ 시간 마킹</span><span class="log-delta mark">—</span></div>`;
+    if (e.sub) {
+      const cls = e.sub === '오탐' ? 'false-pos' : 'false-neg';
+      const sym = e.delta > 0 ? '+1' : '−1';
+      return `<div class="log-item"><span class="log-ts">${fmt(e.ts)}</span><span class="log-zone">${e.sectionName} · ${e.item} <span style="opacity:.6">[${e.sub}]</span></span><span class="log-delta ${cls}">${sym}</span></div>`;
+    }
     const cls = e.delta > 0 ? 'up' : 'down';
     const sym = e.delta > 0 ? '+1' : '−1';
     return `<div class="log-item"><span class="log-ts">${fmt(e.ts)}</span><span class="log-zone">${e.sectionName} · ${e.item}</span><span class="log-delta ${cls}">${sym}</span></div>`;
@@ -359,40 +470,48 @@ function exportCSV() {
     alert('아직 기록된 데이터가 없어요.');
     return;
   }
-  let rows = [['=== 최종 집계 ===', '', '', '', ''], ['구역', '항목', '합계', '구역 합계', '']];
+  let rows = [['=== 최종 집계 ===', '', '', '', '', '', '']];
+  rows.push(['구역', '항목', '합계', '오탐', '미탐', '구역 합계', '']);
 
-  // 번 차선별 그룹화하여 소계 포함
   for (let i = 1; i <= cfg.lanes; i++) {
     let laneTotal = 0;
     cfg.laneItems.forEach(item => {
       const k = key('lane', i, item);
       const val = counts[k] || 0;
+      const fp = subCounts[k + '__fp'] || 0;
+      const fn = subCounts[k + '__fn'] || 0;
       laneTotal += val;
-      rows.push([`${i}번 차선`, item, val, '', '']);
+      rows.push([`${i}번 차선`, item, val, fp, fn, '', '']);
     });
-    rows.push([`${i}번 차선 합계`, '', '', laneTotal, '']);
-    rows.push(['', '', '', '', '']);
+    rows.push([`${i}번 차선 합계`, '', '', '', '', laneTotal, '']);
+    rows.push(['', '', '', '', '', '', '']);
   }
 
-  // 횡단보도별 그룹화하여 소계 포함
   for (let i = 1; i <= cfg.crosses; i++) {
     let crossTotal = 0;
     cfg.crossItems.forEach(item => {
       const k = key('cross', i, item);
       const val = counts[k] || 0;
+      const fp = subCounts[k + '__fp'] || 0;
+      const fn = subCounts[k + '__fn'] || 0;
       crossTotal += val;
-      rows.push([`횡단보도 ${i}`, item, val, '', '']);
+      rows.push([`횡단보도 ${i}`, item, val, fp, fn, '', '']);
     });
-    rows.push([`횡단보도 ${i} 합계`, '', '', crossTotal, '']);
-    rows.push(['', '', '', '', '']);
+    rows.push([`횡단보도 ${i} 합계`, '', '', '', '', crossTotal, '']);
+    rows.push(['', '', '', '', '', '', '']);
   }
 
-  rows.push(['=== 상세 로그 ===', '', '', '', '']);
-  rows.push(['타임스탬프', '구역', '항목', '변화', '누적값']);
+  rows.push(['=== 상세 로그 ===', '', '', '', '', '', '']);
+  rows.push(['타임스탬프', '구역', '항목', '변화', '누적값', '구분', '']);
   [...logs].reverse().forEach(e => {
-    if (!e.mark) rows.push([fmt(e.ts), e.sectionName, e.item, e.delta > 0 ? '+1' : '-1', e.val]);
-    else rows.push([fmt(e.ts), '마킹', '', '', '']);
+    if (!e.mark) {
+      const subLabel = e.sub || '본카운트';
+      rows.push([fmt(e.ts), e.sectionName, e.item, e.delta > 0 ? '+1' : '-1', e.val, subLabel, '']);
+    } else {
+      rows.push([fmt(e.ts), '마킹', '', '', '', '', '']);
+    }
   });
+
   const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
   const a = document.createElement('a');
@@ -405,6 +524,7 @@ function exportCSV() {
 function resetAll() {
   if (!confirm('모든 카운트와 로그를 초기화할까요?')) return;
   logs = [];
+  expanded = {};
   buildPanel();
   renderLog();
 }
@@ -421,7 +541,6 @@ function loadVideo(e) {
   };
 }
 
-// Setup modal
 function openSetup() {
   document.getElementById('fLocName').value = cfg.location;
   document.getElementById('fLanes').value = cfg.lanes;
@@ -462,7 +581,6 @@ function removeItem(type, i) {
 }
 
 function applySetup() {
-  // Read current input values
   document.querySelectorAll('#fLaneItems input').forEach((el, i) => { tempLane[i] = el.value; });
   document.querySelectorAll('#fCrossItems input').forEach((el, i) => { tempCross[i] = el.value; });
   cfg.location = document.getElementById('fLocName').value.trim();
@@ -474,12 +592,12 @@ function applySetup() {
   if (!cfg.crossItems.length) cfg.crossItems = ['보행자'];
   document.getElementById('locTag').textContent = '📍 ' + (cfg.location || '현장 미설정');
   logs = [];
+  expanded = {};
   buildPanel();
   renderLog();
   closeSetup();
 }
 
-// Keyboard: M = mark time
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT') return;
   if (e.key === 'm' || e.key === 'M') markTime();
@@ -507,7 +625,13 @@ async function sendToSheet() {
     });
     cfg.laneItems.forEach(item => {
       const k = key('lane', i, item);
-      rows.push({ zone: `${i}번 차선`, item, value: counts[k] || 0, zoneTotal });
+      rows.push({
+        zone: `${i}번 차선`, item,
+        value: counts[k] || 0,
+        fp: subCounts[k + '__fp'] || 0,
+        fn: subCounts[k + '__fn'] || 0,
+        zoneTotal
+      });
     });
   }
   for (let i = 1; i <= cfg.crosses; i++) {
@@ -518,20 +642,21 @@ async function sendToSheet() {
     });
     cfg.crossItems.forEach(item => {
       const k = key('cross', i, item);
-      rows.push({ zone: `횡단보도 ${i}`, item, value: counts[k] || 0, zoneTotal });
+      rows.push({
+        zone: `횡단보도 ${i}`, item,
+        value: counts[k] || 0,
+        fp: subCounts[k + '__fp'] || 0,
+        fn: subCounts[k + '__fn'] || 0,
+        zoneTotal
+      });
     });
   }
 
-  const payload = {
-    type: 'summary',
-    location: cfg.location || '현장미설정',
-    rows
-  };
+  const payload = { type: 'summary', location: cfg.location || '현장미설정', rows };
 
   try {
     await fetch(GAS_URL, {
-      method: 'POST',
-      mode: 'no-cors',
+      method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
