@@ -628,11 +628,8 @@ async function sendToSheet() {
 
   const rows = [];
   for (let i = 1; i <= cfg.lanes; i++) {
-    let zoneTotal = 0;
-    cfg.laneItems.forEach(item => {
-      const k = key('lane', i, item);
-      zoneTotal += counts[k] || 0;
-    });
+    // zoneTotal = 구역 내 모든 항목의 합계(오탐·미탐 이미 counts에 포함)
+    let zoneTotal = cfg.laneItems.reduce((s, item) => s + (counts[key('lane', i, item)] || 0), 0);
     cfg.laneItems.forEach(item => {
       const k = key('lane', i, item);
       rows.push({
@@ -645,11 +642,7 @@ async function sendToSheet() {
     });
   }
   for (let i = 1; i <= cfg.crosses; i++) {
-    let zoneTotal = 0;
-    cfg.crossItems.forEach(item => {
-      const k = key('cross', i, item);
-      zoneTotal += counts[k] || 0;
-    });
+    let zoneTotal = cfg.crossItems.reduce((s, item) => s + (counts[key('cross', i, item)] || 0), 0);
     cfg.crossItems.forEach(item => {
       const k = key('cross', i, item);
       rows.push({
