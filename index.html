@@ -415,13 +415,23 @@ function change(k, delta) {
 
 function changeSub(k, subType, delta) {
   const sk = k + '__' + subType;
-  subCounts[sk] = Math.max(0, (subCounts[sk] || 0) + delta);
+  // 0 아래로 내려가지 않도록 체크
+  const newSub = Math.max(0, (subCounts[sk] || 0) + delta);
+  const actualDelta = newSub - (subCounts[sk] || 0); // 실제 변화량 (0이면 아무 일도 없음)
+  if (actualDelta === 0) return;
+
+  subCounts[sk] = newSub;
   document.getElementById('sv_' + sk).textContent = subCounts[sk];
+
+  // 미탐·오탐 모두 실제 발생 건수이므로 메인 카운트에도 합산
+  counts[k] = Math.max(0, (counts[k] || 0) + actualDelta);
+  document.getElementById('v_' + k).textContent = counts[k];
+
   const parts = k.split('__');
   const type = parts[0], idx = parts[1], item = parts[2];
   const sectionName = type === 'lane' ? `${idx}번 차선` : `횡단보도 ${idx}`;
   const subLabel = subType === 'fp' ? '오탐' : '미탐';
-  logs.unshift({ ts: curTime(), type, idx, item, sectionName, delta, val: subCounts[sk], sub: subLabel });
+  logs.unshift({ ts: curTime(), type, idx, item, sectionName, delta: actualDelta, val: counts[k], sub: subLabel });
   renderLog();
   updateSectionBadges();
 }
